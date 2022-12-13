@@ -7,7 +7,7 @@ library(tidyr)
 ##'[Panel A: plot the burial data]##
 ####################################
 
-Burial_df <- readRDS("analysis/data/Code-generated-data/00_07_Burial_registrations_2017_2021.rds") %>%
+Burial_df <- readRDS("Analysis/Data/derived_data/00_07_Burial_registrations_2017_2021.rds") %>%
   rename(Age_gr_fig2 = Age_gr_fig_2b) %>%
   group_by(Age_gr_fig2, Week_st) %>%
   summarise(Total_deaths = n()) %>%
@@ -82,7 +82,7 @@ p1 <- ggplot(Burs_Excess, aes(x = Week_st, y = Total_deaths, color = Age_gr_fig2
 #######################################
 
 ### mcmc results
-mcmc <- readRDS("../Bonus Files/2022-08-19_17_Baseline_Mortality_mcmc_Gamma_Prior_inc_Feb_2021.rds")
+mcmc <- readRDS("Analysis/Data/derived_data/Baseline_Mortality_MCMC_Gamma_Prior_inc_Feb_2021.rds")
 mcmc_samples <- mcmc$output %>% filter(phase =="sampling")
 
 AG1_mcmc <- mcmc_samples[, c(paste0("Week_rate_0to5_",c(1:180)))]
@@ -107,9 +107,9 @@ WeeklyStandardise <- WeeklyStandardise %>%
   reshape2::melt(value.name = "Standard", varnames = c("list_names","Week_gr"))
 
 # Get population structure
-Pop_Str <- readRDS("Data/00_02_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
+Pop_Str <- readRDS("Analysis/Data/derived_data/00_02_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
 
-Burs_2018_2021_all_age_groups <- readRDS("Data/00_07_Burial_registrations_2017_2021.rds") %>%
+Burs_2018_2021_all_age_groups <- readRDS("Analysis/Data/derived_data/00_07_Burial_registrations_2017_2021.rds") %>%
   group_by(Age_gr, Week_st) %>%
   summarise(Total_deaths = n()) %>%
   ungroup() %>% complete(Age_gr, Week_st, fill = list(Total_deaths = 0)) %>%
@@ -314,11 +314,11 @@ p7 <- ggplot(Panel_G_plot_data_long %>% merge(Dates_df), aes(x = Week_st, color 
 ##'[Panel H: DMVI]##
 ####################################
 ## Get overall population IFR for Zambia and Lusaka
-IFR_weighted_Zamb <- readRDS("../Bonus Files/WHO_report_12_comparison/outputs/IFR_Zambia.rds") %>% pull(IFR_Braz)
-IFR_weighted_Lus <- readRDS("analysis/data/Code-generated-data/00_03_Lusaka_Overall_IFR.rds")
+IFR_weighted_Zamb <- readRDS("Analysis/Data/derived_data/IFR_Zambia.rds") %>% pull(IFR_Braz)
+IFR_weighted_Lus <- readRDS("Analysis/Data/derived_data/00_03_Lusaka_Overall_IFR.rds")
 
 # Get WHO excess mortality for Zambia by month and calculate DVWI based on Zambia IFR
-WHO_Covid_deaths <- readxl::read_xlsx("../Bonus Files/WHO_report_12_comparison/inputs/WHO_estimates/WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx", sheet = "Country by year and month", skip =12) %>%
+WHO_Covid_deaths <- readxl::read_xlsx("Analysis/Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx", sheet = "Country by year and month", skip =12) %>%
   filter(country =="Zambia",year == 2020 | year == 2021 & month %in% 1:6) %>%
   select(year, month, cumul.excess.mean, cumul.excess.low, cumul.excess.high) %>%
   add_row(.before = 1, year = 2020, month = 0, cumul.excess.mean = 0, cumul.excess.low = 0, cumul.excess.high = 0) %>%
@@ -371,32 +371,7 @@ p7 <- ggplot(Panel_G_plot_data_long %>% merge(Dates_df), aes(x = Week_st, color 
         axis.text.x = element_text(size = 10))
 
 
-pdf.options(reset = TRUE, onefile = FALSE)
-pdf("analysis/figures/48_Figure_2_Excess_Mortality_version2.pdf", width = 12, height = 12)
-cowplot::plot_grid(cowplot::plot_grid(p1 + theme(legend.position = "none",
-                                                 plot.title = element_text(vjust = 1, hjust = -0.09)),
-                                      p2 + theme(legend.position = "none",
-                                                 plot.title = element_text(vjust = 1, hjust = -0.09)),
-                                      p3 + theme(legend.position = "none",
-                                                 plot.title = element_text(vjust = 1, hjust = -0.09)),
-                                      p4 + theme(legend.position = "none",
-                                                 plot.title = element_text(vjust = 1, hjust = -0.09)), nrow = 1, rel_widths = c(1.05,1,1,1.05)),
-                   cowplot::plot_grid(
-                     cowplot::plot_grid(p5a + theme(legend.position = "none"),
-                                        p5b + theme(legend.position = "none"),
-                                        nrow = 2, align = "v", rel_heights = c(1,1.5)),
-                     cowplot::plot_grid(
-                       cowplot::plot_grid(
-                         p6 + theme(legend.position = "none"),
-                         p7 + theme(legend.position = "none"), nrow = 1, rel_widths = c(1,1)),
-                       ggpubr::get_legend(p7 + theme(legend.position = "top",
-                                                     legend.spacing.x = unit(0.3, "cm"),
-                                                     legend.text.align = 0,
-                                                     legend.text = element_text(margin = margin(l = 0, r = 40)))), nrow = 2, rel_heights = c(1,0.2))), nrow = 2, rel_heights = c(7,3))
-
-dev.off()
-
-tiff("analysis/figures/48_Figure_2_Excess_Mortality_version2.tiff", width = 12, height = 12, units = "in", res = 150)
+tiff("Analysis/Figures/Figure_3_Excess_Mortality.tiff", width = 12, height = 12, units = "in", res = 150)
 cowplot::plot_grid(cowplot::plot_grid(p1 + theme(legend.position = "none",
                                                  plot.title = element_text(vjust = 1, hjust = -0.09)),
                                       p2 + theme(legend.position = "none",

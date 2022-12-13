@@ -8,12 +8,12 @@ library(dplyr)
 #########################################
 
 # Read and format official COVID_19 deaths in Lusaka
-Off_data_prov <- readRDS("analysis/data/Code-generated-data/00_01_Lusaka_Prov_Deaths_Official.rds") %>%
+Off_data_prov <- readRDS("Data/derived_data/00_01_Lusaka_Prov_Deaths_Official.rds") %>%
   mutate(Week = lubridate::floor_date(date, unit = "week", week_start = 1)) %>%
   group_by(Week) %>% summarise(Off_deaths = sum(deaths)) %>%
   mutate(Roll_Av =zoo::rollapply(Off_deaths,3,mean,fill=NA))
 
-Off_data_dist <- readRDS("analysis/data/Code-generated-data/00_01_Lusaka_Dist_Deaths_Official.rds") %>%
+Off_data_dist <- readRDS("Data/derived_data/00_01_Lusaka_Dist_Deaths_Official.rds") %>%
   mutate(Week = lubridate::floor_date(date, unit = "week", week_start = 1)) %>%
   group_by(Week) %>% summarise(Off_deaths = sum(deaths)) %>%
   mutate(Roll_Av =zoo::rollapply(Off_deaths,3,mean,fill=NA))
@@ -37,7 +37,7 @@ p1 <- ggplot() +
   scale_linetype_manual("", values = c(1,3))
 
 ## Results for text
-readRDS("analysis/data/Code-generated-data/00_01_Lusaka_Prov_Deaths_Official.rds") %>% filter(date>=as.Date("2020-06-01") & date < as.Date("2020-09-01")) %>%
+readRDS("Data/derived_data/00_01_Lusaka_Prov_Deaths_Official.rds") %>% filter(date>=as.Date("2020-06-01") & date < as.Date("2020-09-01")) %>%
   pull(deaths) %>% sum()
 
 
@@ -46,7 +46,7 @@ readRDS("analysis/data/Code-generated-data/00_01_Lusaka_Prov_Deaths_Official.rds
 #####################################
 
 # Get and format total burial registrations
-BurRegs <- readRDS("analysis/data/Code-generated-data/00_07_Burial_registrations_by_week_2017_to_2021.rds") %>%
+BurRegs <- readRDS("Data/derived_data/00_07_Burial_registrations_by_week_2017_to_2021.rds") %>%
   rename(Week = Week_st,
          BurRegs = Total_deaths) %>%
   filter(Week >= as.Date("2017-12-25"),
@@ -83,7 +83,7 @@ BurRegs %>% filter(Week > "2021-06-01")
 ###########################################################
 
 # Read and format burial registrations to calculate average age
-Av_Age <- read.csv(file = "analysis/data/raw/BMJ_UTH_excess_mortality/mortuary_records_v2.csv") %>%
+Av_Age <- read.csv(file = "Data/raw_data/mortuary_records_v2.csv") %>%
   filter(age_years !=".",dod !=".") %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
   mutate(Week = lubridate::floor_date(date, unit = "week", week_start = 1)) %>%
@@ -116,7 +116,7 @@ Av_Age %>% filter(Week >= "2018-01-01", Week < "2019-12-25") %>% pull(av_age) %>
 ####################################################
 
 # Read and format age-structured burial registrations
-UTH_Mortality_Total <- read.csv(file = "analysis/data/raw/BMJ_UTH_excess_mortality/mortuary_records_v2.csv") %>%
+UTH_Mortality_Total <- read.csv(file = "Data/raw_data/mortuary_records_v2.csv") %>%
   filter(age_years !=".",
          dod !=".") %>%
   mutate(date = as.Date(dod, "%m/%d/%y"),
@@ -177,10 +177,6 @@ g$heights[43] <- unit(4,"null")
 grid.newpage()
 grid.draw(g)
 
-pdf("Figure_2_Prop_Burial_Registrations.pdf", width = 10, height = 10)
-grid.draw(g)
-dev.off()
-
-tiff("Figure_2_Prop_Burial_Registrations.tiff", width = 10, height = 10, units = "in", res = 150)
+tiff("Figures/Figure_2_Prop_Burial_Registrations.tiff", width = 10, height = 10, units = "in", res = 150)
 grid.draw(g)
 dev.off()

@@ -5,7 +5,7 @@ library(dplyr)
 ############################################
 ##'[drjacoby MCMC K-fold Cross validation]##
 ############################################
-UTH_Mortality_Total <- read.csv(file = "Data/BMJ_UTH_excess_mortality/mortuary_records_v2.csv")
+UTH_Mortality_Total <- read.csv(file = "Analysis/Data/raw_data/mortuary_records_v2.csv")
 
 weekly_deaths_list_5_plus_loocv <- UTH_Mortality_Total %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
@@ -90,7 +90,7 @@ Test_weeks_loocv <- as.list(as.data.frame(matrix(sample(1:104, 104, replace = F)
 names(Test_weeks_loocv) <- NULL
 
 didehpc::web_login()
-ctx_bl_loocv <- context::context_save("context_mcmc_baseline_kfcv", sources = "04_mcmc_loocv_functions.R", package_sources = conan::conan_sources("mrc-ide/drjacoby"))
+ctx_bl_loocv <- context::context_save("context_mcmc_baseline_kfcv", sources = "Analysis/Code/Code_Functions/drjacoby_MCMC_K-fold_Cross_validaion.R", package_sources = conan::conan_sources("mrc-ide/drjacoby"))
 obj_bl_loocv <- didehpc::queue_didehpc(ctx_bl_loocv)
 t_loocv <- obj_bl_loocv$lapply(Test_weeks_loocv, dj_loocv,
                                df_params = df_params_loocv,
@@ -145,7 +145,7 @@ Test_weeks_match <- str2str::ld2d(lapply(1:26, function(x){
   as.data.frame(cbind(x,Test_weeks[[x]]))
 })) %>% select(x, V2) %>% rename(Week_gr = V2, Test_weeks_set = x)
 
-UTH_Mortality <- read.csv(file = "Data/mortuary_records.csv") %>%
+UTH_Mortality <- read.csv(file = "Analysis/Data/raw_data/mortuary_records.csv") %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
   filter(date >= "2018-01-01" & date < "2019-12-30", age_years !=".", dod != ".") %>%
   mutate(Age_gr = cut(as.numeric(age_years), c(seq(0,80,by = 5),Inf), right = F, labels = F),
@@ -186,17 +186,7 @@ Median_Baseline_2018_2019 <- UTH_Mortality %>% group_by(Age_gr) %>%
   summarise(median_baseline = median(Mort_deaths)*4)
 
 
-pdf.options(reset = TRUE, onefile = FALSE)
-pdf("analysis/figures/54_KFCV_combined_split.pdf", height = 6, width = 7)
-p3 +
-  geom_hline(data = Median_Baseline_2018_2019 %>% filter(Age_gr !=1), aes(yintercept = median_baseline), color = "darkgrey", size = 0.35) +
-  geom_point(color = "black", size = 0.5) +
-  geom_point(aes(color = as.factor(Age_gr)), size = 0.3) +
-  facet_wrap(~Age_gr, scales = "free", labeller = labeller(Age_gr = Age_groups.labs)) +
-  theme(legend.position = "none", title = element_blank(), axis.title = element_text(), plot.margin = margin(5,10,5,5, "points"))  # xlab("Burial registrations") + ylab("Model predictions")
-dev.off()
-
-tiff("analysis/figures/54_KFCV_combined_split.tiff", units = "in", res = 300, height = 6, width = 7)
+tiff("Analysis/Figures/SI_KFCV_combined_split.tiff", units = "in", res = 300, height = 6, width = 7)
 p3 + #xlim(c(0,165)) + ylim(c(0,160)) +
   geom_hline(data = Median_Baseline_2018_2019 %>% filter(Age_gr !=1), aes(yintercept = median_baseline), color = "darkgrey", size = 0.35) +
   geom_point(color = "black", size = 0.5) +

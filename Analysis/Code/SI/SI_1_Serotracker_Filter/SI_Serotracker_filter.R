@@ -1,4 +1,4 @@
-df <- read.csv("Data/SeroTracker_ Serosurveys Reporting Prevalence-Grid view_filtered.csv")
+df <- read.csv("Analysis/Data/raw_data/SeroTracker_ Serosurveys Reporting Prevalence-Grid view_filtered.csv")
 names(df)
 library(dplyr)
 unique(df$Country)

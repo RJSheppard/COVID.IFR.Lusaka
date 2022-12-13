@@ -93,7 +93,7 @@ fit_spline_rt <- function(data,
   last_start_date <- as.Date(null_na(min_death_date))-10
   first_start_date <- as.Date(null_na(min_death_date))-55
   start_date <- as.Date(null_na(min_death_date))-50
-# browser()
+
   # These 4 parameters do nothign as setting R0_change to 1
   Meff_min <- -2
   Meff_max <- 2
@@ -108,14 +108,14 @@ fit_spline_rt <- function(data,
   ## -----------------------------------------------------------------------------
   ## Step 2b: Sourcing suitable starting conditions
   ## -----------------------------------------------------------------------------
-# browser()
+
   date_start <- data$date[which(cumsum(data$deaths)>10)[1]] - 50
   R0_start <- 3
-# browser()
+
   # These are the the initial conditions now loaded from our previous run.
   R0_start <- min(max(R0_start, R0_min), R0_max)
   date_start <- min(max(as.Date(start_date), as.Date(first_start_date)), as.Date(last_start_date))
-# browser()
+
   # again these all do nothing
   Meff_start <- min(max(0, Meff_min), Meff_max)
   Meff_pl_start <- min(max(0.5, Meff_pl_min), Meff_pl_max)
@@ -148,7 +148,7 @@ fit_spline_rt <- function(data,
   ## Step 2d: PMCMC parameter set up
   ## -----------------------------------------------------------------------------
 
-  # seroconversion data from brazeay report 34
+  # seroconversion data from brazeau report 34
   # sero_sens = 0.9
   prob_conversion <-  cumsum(dgamma(0:300,shape = 5, rate = 1/2))/max(cumsum(dgamma(0:300,shape = 5, rate = 1/2)))
   sero_det <- cumsum(dweibull(0:300, 3.669807, scale = 143.7046))
@@ -173,7 +173,6 @@ fit_spline_rt <- function(data,
     if(is.null(pcr_det_PM)){pcr_det_PM <- pcr_det_default}
   }
 
-#   browser()
 # p1 <- ggplot2::ggplot(data = data.frame("Days_since_inf" = 1:length(pcr_det),
 #                                         pcr_det), aes(y = pcr_det, x = Days_since_inf, linetype = "100%")) + geom_line() +
 #   # geom_line(aes(y = pcr_det *0.9, linetype = "90%")) +
@@ -191,15 +190,9 @@ fit_spline_rt <- function(data,
 #   ggtitle("Seropositive detection probability")+
 #   theme_minimal()
 #
-# pdf("analysis/figures/squire_utils_detection_probabilities.pdf", height = 3, width = 7)
+# tiff("Analysis/Figures/SI_squire_utils_detection_probabilities.tiff", units = "in", res = 300, height = 3, width = 7)
 # cowplot::plot_grid(p1,p2, nrow = 1)
 # dev.off()
-#
-# tiff("analysis/figures/squire_utils_detection_probabilities.tiff", units = "in", res = 300, height = 3, width = 7)
-# cowplot::plot_grid(p1,p2, nrow = 1)
-# dev.off()
-
-# browser()
 
   # PMCMC Parameters
   pars_init = list('start_date' = date_start,
@@ -231,7 +224,7 @@ fit_spline_rt <- function(data,
   pars_min <- append(pars_min, pars_min_rw)
   pars_max <- append(pars_max, pars_max_rw)
   pars_discrete <- append(pars_discrete, pars_discrete_rw)
-# browser()
+
   # add reporting bounds if given
   if(!is.null(reporting_fraction_bounds)){
     pars_init <- append(pars_init, c("rf"=reporting_fraction_bounds[1]))
@@ -319,7 +312,7 @@ fit_spline_rt <- function(data,
 
   # mixing matrix - assume is same as country as whole
   # mix_mat <- squire::get_mixing_matrix(country)
-# browser()
+
   # run the pmcmc
   res <- squire::pmcmc(data = data,
                        n_mcmc = n_mcmc,
@@ -356,7 +349,6 @@ fit_spline_rt <- function(data,
                        baseline_ICU_bed_capacity = icu_beds,
                        ...)
 
-# browser()
   ## remove things so they don't atke up so much memory when you save them :)
 
   # Add the prior
@@ -427,7 +419,7 @@ seroprev_df <- function(res){
 
   pcr_det_sero_len <- c(pcr_det, rep(0, length(sero_det)-length(pcr_det)))
   combined_det <-   1-((1-c(0, 0, 0, 0, head(sero_det, -4))) * (1-pcr_det_sero_len))
-# browser()
+
   inf <- inf %>%
     group_by(replicate) %>%
     na.omit() %>%
@@ -441,7 +433,6 @@ seroprev_df <- function(res){
     ungroup
 
   inf$reporting_fraction <- res$pmcmc_results$inputs$pars_obs$phi_death
-  # browser()
 
   return(inf)
 
