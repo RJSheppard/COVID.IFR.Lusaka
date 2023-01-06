@@ -15,17 +15,17 @@ library(tidyverse)
 # Import/Tidy
 #...........................................................
 # ifr dat from lognormal model in scrip `05-analyze_age_IFRs_v2.R`
-ifrdat <- readRDS("Data/raw_data/ifrdat.RDS")
+ifrdat <- readRDS("Data/raw_data/07_ifrdat.RDS") # Available on request
 
 ifrdat %>% filter(sero == "reg") %>% pull(bestestmod)
 ifrdat %>% filter(sero == "reg") %>% pull(linear_predints)
 
 # read in Richard's countries
-cntry <- readr::read_tsv("Data/raw_data/countries.txt", col_names = F)
+cntry <- readr::read_tsv("Data/raw_data/08_countries.txt", col_names = F)
 cntry <- unlist(cntry)
 
 # tidy up UN World Population Prospects
-wpp <- readxl::read_excel("Data/raw_data/wpp_un_agepopulations.xlsx")
+wpp <- readxl::read_excel("Data/raw_data/09_wpp_un_agepopulations.xlsx")
 wpp <- wpp[wpp$`Reference date (as of 1 July)` == 2020,]
 wpp <- wpp %>%
   dplyr::select(c("Region, subregion, country or area *",
@@ -60,7 +60,7 @@ wpp <- wpp %>%
   tidyr::nest(.) %>%
   dplyr::rename(popN = data)
 
-Complete_Population_demog <- readRDS(file = "Data/derived_data/Complete_Population_demog.rds") %>% rename(georegion = area,
+Complete_Population_demog <- readRDS(file = "Data/derived_data/01_Complete_Population_demog.rds") %>% rename(georegion = area,
                                                                                         ageband = age_cat,
                                                                                         popN = n) %>%
   mutate(ageband = as.numeric(ageband),
@@ -122,6 +122,6 @@ out <- overall_IFR_best_est %>%
 
 ############################################
 ############################################
-saveRDS(out, "Data/derived_data/Brazeau_IFR_Post_predictive_CrIs")
+saveRDS(out, "Data/derived_data/02_Brazeau_IFR_Post_predictive_CrIs.rds")
 ############################################
 ############################################

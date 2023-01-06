@@ -444,15 +444,3 @@ Summ_sero_pcr_data <- function(x){
     summarise(median_pcr = median(pcr_perc)*100, min_pcr = min(pcr_perc)*100, max_pcr = max(pcr_perc)*100, ci_low_pcr = 100*bayestestR::ci(pcr_perc)$CI_low, ci_high_pcr = 100*bayestestR::ci(pcr_perc)$CI_high,
               median_sero = median(sero_perc)*100, min_sero = min(sero_perc)*100, max_sero = max(sero_perc)*100, ci_low_sero = 100*bayestestR::ci(sero_perc)$CI_low, ci_high_sero = 100*bayestestR::ci(sero_perc)$CI_high,
               median_combined = median(combined_perc)*100, min_combined = min(combined_perc)*100, max_combined = max(combined_perc)*100)}
-
-# pcr_at_date <- function(date, infections, det, dates, N) {
-#
-#   di <- which(dates == date)
-#   if(length(di) > 0) {
-#     to_sum <- tail(infections[seq_len(di)], length(det))
-#     min(sum(rev(to_sum)*head(det, length(to_sum)), na.rm=TRUE)/N, 0.99)
-#   } else {
-#     0
-#   }
-#
-# }

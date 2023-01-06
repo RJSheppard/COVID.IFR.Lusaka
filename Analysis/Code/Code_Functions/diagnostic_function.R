@@ -38,9 +38,9 @@ Diagnostic_Plot <- function(fit_num, fit_Model_list, IFRvals,
   Mod_Age_Deaths_Lus <- Mod_Age_Deaths_Lus_pcr %>%
     filter(date > "2020-06-10") %>%
     mutate(Week_gr = as.numeric(cut.Date(date, breaks = "1 week"))) %>%
-    group_by(Age_gr, Week_gr, Replicate) %>% #filter(Week_gr ==2, Age_gr ==2) %>% pull(pcr_perc)
+    group_by(Age_gr, Week_gr, Replicate) %>%
     summarise(Mod_cd_Lus = max(Mod_cd_Lus),
-              pcr_perc = pcr_perc[4], # Wednesday - middle of the study week
+              pcr_perc = pcr_perc[4], # Thursday - middle of the study week
               infs = sum(infs)) %>%
     ungroup() %>% group_by(Age_gr, Replicate) %>%
     mutate(Mod_cd_Lus = c(0,diff(Mod_cd_Lus))) %>% #,
@@ -90,7 +90,7 @@ Diagnostic_Plot <- function(fit_num, fit_Model_list, IFRvals,
 
       tmp_df$Sample_no <- y
       tmp_df <- tmp_df[c("Sample_no", "Week_gr", "Age_gr","Replicate", "l_pois", "l_binom",
-                         "Mod_cd_morgue","Mort_ncd_mcmc",#"infs","pcr_perc",
+                         "Mod_cd_morgue","Mort_ncd_mcmc",
                          "Mod_tot_ds_morgue","Mod_coin_cpos_ds_morgue","Mod_pos_ds_morgue",
                          "Bur_regs")]
     })
@@ -136,7 +136,7 @@ Diagnostic_Plot <- function(fit_num, fit_Model_list, IFRvals,
     ll_ov_pois_bin <- Res_2d %>% group_by(Replicate, Sample_no) %>%
       summarise(ll_pois_prod = log(Brobdingnag::prod(Brobdingnag::as.brob(l_pois))),
                 l_binom_prod = prod(l_binom)) %>%
-      ## Then take the mean of everything?
+      ## Then take the mean of everything
       ungroup() %>% group_by(Replicate) %>%
       summarise(ll_pois_mean_overall = log(Brobdingnag::sum(exp(Brobdingnag::as.brob(ll_pois_prod)))/length(ll_pois_prod)),
                 ll_bin_mean_overall = log(mean(l_binom_prod)))
@@ -270,7 +270,7 @@ Diagnostic_Plot <- function(fit_num, fit_Model_list, IFRvals,
   ## Plot 6: Weekly prevalence fit
   Week_prev_plot <- ggplot(data = Mod_Age_Deaths_Lus_Av_Week, aes(x = date)) +
     # Prevalence on positive in sample
-    geom_point(aes(y = PosTests/Samples, color = "Total +ve deaths")) +#, col = as.factor(Unreliable_points_key))) +
+    geom_point(aes(y = PosTests/Samples, color = "Total +ve deaths")) +
     geom_errorbar(aes(ymin = Hmisc::binconf(PosTests,Samples)[,"Lower"],
                       ymax = Hmisc::binconf(PosTests,Samples)[,"Upper"])) +
     coord_cartesian(ylim = c(0,1)) +
@@ -352,6 +352,17 @@ Diagnostic_Plot <- function(fit_num, fit_Model_list, IFRvals,
                 Week_prev_plot = Week_prev_plot + scale_color_manual(name = NULL, breaks = c("Total +ve deaths"),values = c("black")),
                 Age_prev_plot = Age_prev_plot + scale_color_manual(name = NULL, breaks = c("Total +ve deaths"),values = c("black")),
                 PCR_sero_prev_plot = PCR_sero_prev_plot))
+  }
+
+  if(get_data){
+    return(list(lls = lls,
+                fit_Model = fit_Model,
+                pcr_sero_data = pcr_sero_data,
+                Mod_Age_Deaths_Lus_Av_Age = Mod_Age_Deaths_Lus_Av_Age,
+                Mod_Age_Deaths_Lus_Av_Week = Mod_Age_Deaths_Lus_Av_Week,
+                Mod_Age_Deaths_Lus_Av_Age = Mod_Age_Deaths_Lus_Av_Age,
+                Mod_Age_Deaths_Lus_Av_Week = Mod_Age_Deaths_Lus_Av_Week
+    ))
   }
 
 

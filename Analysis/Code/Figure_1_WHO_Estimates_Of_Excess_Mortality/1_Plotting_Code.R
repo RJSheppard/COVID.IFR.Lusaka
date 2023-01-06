@@ -14,18 +14,18 @@ library(readxl)
 # Country death estimates for each year, with population sizes
 
 ## WHO estimates of excess mortality
-WHO_estimate_region_age_year <- read_xlsx(path = "Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByRegion.xlsx",sheet="Region by year, sex and age", skip = 10)
-WHO_estimate_region_year <- read_xlsx("Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByRegion.xlsx",sheet="Region by year and month", skip = 11)
-WHO_estimate_ctry_age_year <- read_xlsx("Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx",sheet="Country by year, sex and age", skip = 10)
-WHO_estimate_ctry_year <- read_xlsx("Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx",sheet="Country rate by year", skip = 8)
+WHO_estimate_region_age_year <- read_xlsx(path = "Data/raw_data/01_WHO_COVID_Excess_Deaths_EstimatesByRegion.xlsx",sheet="Region by year, sex and age", skip = 10)
+WHO_estimate_region_year <- read_xlsx("Data/raw_data/01_WHO_COVID_Excess_Deaths_EstimatesByRegion.xlsx",sheet="Region by year and month", skip = 11)
+WHO_estimate_ctry_age_year <- read_xlsx("Data/raw_data/02_WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx",sheet="Country by year, sex and age", skip = 10)
+WHO_estimate_ctry_year <- read_xlsx("Data/raw_data/02_WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx",sheet="Country rate by year", skip = 8)
 
 # UN population demographics
-un_demog <- read_xlsx(path = "Data/raw_data/unpopulation_dataportal_20220810111500.xlsx",sheet="Data",skip = 4)
+un_demog <- read_xlsx(path = "Data/raw_data/03_unpopulation_dataportal_20220810111500.xlsx",sheet="Data",skip = 4)
 names(un_demog) <- c("country","year",paste0("age_cat",1:21))
 un_demog <- un_demog %>% mutate(country=replace(country,country=="Dem. Rep. of the Congo","Democratic Republic of the Congo"))
 
 ## Un data for ISO codes (not found in un demog)
-un_for_iso <- read_xlsx("Data/raw_data/WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx",sheet="Estimates",skip = 15)
+un_for_iso <- read_xlsx("Data/raw_data/04_WPP2022_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT_REV1.xlsx",sheet="Estimates",skip = 15)
 names(un_for_iso) <- un_for_iso[1,]
 un_for_iso <- un_for_iso[-1,]
 
@@ -38,11 +38,11 @@ un_for_iso <- un_for_iso %>%
   mutate(country=replace(country,country=="Dem. Republic of the Congo","Democratic Republic of the Congo"))
 
 # Get WHO region to country level ISO codes conversion
-WHO_regions<-read.csv("Data/raw_data/who-regions.csv")%>%
+WHO_regions<-read.csv("Data/raw_data/05_who-regions.csv")%>%
   rename(iso3=Code)
 
 # Get Brazeau et al. estimates of COVID-19 IFR (including CIs)
-brazeau <- read_xlsx("Data/raw_data/Brazeau_et_al.xlsx")
+brazeau <- read_xlsx("Data/raw_data/06_Brazeau_et_al.xlsx") # Available on reasonable request
 
 
 #########################
@@ -130,7 +130,7 @@ Complete_Demog <- Country_demog_iii %>% rename(area = country, n = pop) %>%
   merge(Global_demog_i %>% rename(n = pop), all = T)
 
 # Save complete age-specific demographies for use in "2_Overall_COVID_IFR_CIs"
-saveRDS(Complete_Demog, "Data/derived_data/Complete_Population_demog.rds")
+saveRDS(Complete_Demog, "Data/derived_data/01_Complete_Population_demog.rds")
 
 # Calculate IFR values for each area
 IFR_global<-merge(brazeau,Global_demog_i,by="age_cat")%>%
@@ -164,7 +164,7 @@ col_scheme<-c("black",WHO_pal,africa_pal)
 names(col_scheme)<-c("Global",region_ord,Africa_ord)
 
 # For each country: calculate confirmed deaths per million in 2020
-Confirmed_deaths_WHO <- read.csv(file = "Data/raw_data/WHO-COVID-19-global-data.csv", header = T)
+Confirmed_deaths_WHO <- read.csv(file = "Data/raw_data/10_WHO-COVID-19-global-data.csv", header = T)
 Confirmed_deaths_pc_countries <- Confirmed_deaths_WHO %>%
   select(Country, WHO_region, Cumulative_deaths, Date_reported) %>%
   filter(Date_reported =="2020-12-31",
@@ -225,7 +225,7 @@ excess_plot<-ggplot(
 
 
 # Get and manage IFR CrIs and calculate DVWI values
-IFR_vals_Braz <- readRDS("Data/derived_data/Brazeau_IFR_Post_predictive_CrIs.rds") %>%
+IFR_vals_Braz <- readRDS("Data/derived_data/02_Brazeau_IFR_Post_predictive_CrIs.rds") %>%
   rename(area = georegion,
          IFR_mean = mean,
          IFR_med = Q50) %>%

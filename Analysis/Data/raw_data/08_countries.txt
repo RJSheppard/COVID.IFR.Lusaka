@@ -1,0 +1,47 @@
+Angola
+Burundi
+Benin
+Burkina Faso
+Botswana
+Central African Republic
+Côte d'Ivoire
+Cameroon
+Democratic Republic of the Congo
+Congo
+Comoros
+Cabo Verde
+Algeria
+Eritrea
+Ethiopia
+Gabon
+Ghana
+Guinea
+Gambia
+Guinea-Bissau
+Equatorial Guinea
+Kenya
+Liberia
+Lesotho
+Madagascar
+Mali
+Mozambique
+Mauritania
+Mauritius
+Malawi
+Namibia
+Niger
+Nigeria
+Rwanda
+Senegal
+Sierra Leone
+South Sudan
+Sao Tome and Principe
+Eswatini
+Seychelles
+Chad
+Togo
+United Republic of Tanzania
+Uganda
+South Africa
+Zambia
+Zimbabwe

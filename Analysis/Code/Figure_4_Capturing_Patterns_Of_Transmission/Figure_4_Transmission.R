@@ -15,37 +15,38 @@ library(Brobdingnag)
 ##############################################
 ## Load data
 ## Official data for generating initial start date
-data <- Off_data <- readRDS(file = "Analysis/Data/derived_data/00_01_Lusaka_Dist_Deaths_Official.rds")
+data <- Off_data <- readRDS(file = "Analysis/Data/derived_data/04_Lusaka_Dist_Deaths_Official.rds")
 
 # Lusaka population
-population <- readRDS("Analysis/Data/derived_data/00_02_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
+population <- readRDS("Analysis/Data/derived_data/08_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
+
 # Nyanga contact matrix
-baseline_contact_matrix <- as.matrix(readRDS("Analysis/Data/derived_data/00_11_Nyanga_Mixing_Matrix.rds"))
+baseline_contact_matrix <- as.matrix(readRDS("Analysis/Data/derived_data/11_Nyanga_Mixing_Matrix.rds"))
 
 # Burial registrations and Post-Mortem data
-Comb_data <- readRDS("Analysis/Data/derived_data/00_13_Combined_bur_regs_postmortem_data_complete.rds")
+Comb_data <- readRDS("Analysis/Data/derived_data/12_Combined_bur_regs_postmortem_data_complete.rds")
 Comb_data <- Comb_data %>% mutate(PosTests = PosTests_Strict)
 
 # Baseline registration estimates
-dfj_mcmc_data <- readRDS(file = "Analysis/Data/derived_data/00_16_03_drj_mcmc_data_new_pop_str_2.rds")
+dfj_mcmc_data <- readRDS(file = "Analysis/Data/derived_data/13_drj_mcmc_data_new_pop_str_2.rds")
 
 # Population PCR and seroprevalence data
-pcr_df <- readRDS("Analysis/Data/derived_data/00_10_Lancet_Data.rds")$pcr_df
-sero_df <- readRDS("Analysis/Data/derived_data/00_10_Lancet_Data.rds")$sero_df
+pcr_df <- readRDS("Analysis/Data/derived_data/14_Lancet_Data.rds")$pcr_df
+sero_df <- readRDS("Analysis/Data/derived_data/14_Lancet_Data.rds")$sero_df
 
 # probability of hospitalisation and death
-probs_hosp_death <- readRDS("Analysis/Data/derived_data/00_03_IFR_probs_death_hosp.rds")
+probs_hosp_death <- readRDS("Analysis/Data/derived_data/15_IFR_probs_death_hosp.rds")
 names(probs_hosp_death) <- paste0("X",1:81)
 
 # Durations until death or survival following infection
-Weighted_Durs_Hosp <- readRDS("Analysis/Data/derived_data/00_04_Weighted_durations_death_survive.rds")
+Weighted_Durs_Hosp <- readRDS("Analysis/Data/derived_data/16_Weighted_durations_death_survive.rds")
 dur_get_ox_survive <- Weighted_Durs_Hosp$Surv_Dur_Weighted
 dur_get_ox_die <- Weighted_Durs_Hosp$Death_Dur_Weighted
 # Assume that deaths without hospital treatment have half duration of treatment and that 70% die at home
 dur_death_default <- dur_get_ox_die*0.3 + (dur_get_ox_die*0.5)*0.7
 
 # PCR prevalence with 100% maximum sensitivity
-pcr_det_100 <- readRDS("Analysis/Data/derived_data/00_15_pcr_det_hall_100.rds")
+pcr_det_100 <- readRDS("Analysis/Data/derived_data/17_pcr_det_hall_100.rds")
 
 #########################
 ###????### Should this be a new package??? I suppose I can create a data folder, just to make sure everything works...
@@ -91,12 +92,12 @@ Model_Fit <- fit_spline_rt(
   Prior_Rt_rw_unif_lim = 1
 )
 
-# saveRDS(object = Model_Fit, file = "../Bonus Files/Model_Fit_Default_Assumptions.rds")
+saveRDS(object = Model_Fit, file = "Analysis/Results/Model_Fit_Default_Assumptions.rds")
 
 ###########################
 ##'[Plot the for 1x1 fit]##
 ###########################
-IFR_coefficients <- readRDS("Analysis/Data/derived_data/00_03_IFR_matrix_coefficients_log_scale_new_pop_str_ests.rds") %>%
+IFR_coefficients <- readRDS("Analysis/Data/derived_data/18_IFR_matrix_coefficients_log_scale_new_pop_str_ests.rds") %>%
   mutate(Index = 1:nrow(.))
 
 Model_Fit_1x1_plot <- Diagnostic_Plot(1, fit_Model_list = Model_Fit, IFRvals = IFR_coefficients[41,], Return_likelihoods_only = F)

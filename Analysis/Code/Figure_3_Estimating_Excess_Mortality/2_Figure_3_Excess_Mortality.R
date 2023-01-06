@@ -7,7 +7,7 @@ library(tidyr)
 ##'[Panel A: plot the burial data]##
 ####################################
 
-Burial_df <- readRDS("Analysis/Data/derived_data/00_07_Burial_registrations_2017_2021.rds") %>%
+Burial_df <- readRDS("Analysis/Data/derived_data/07_Burial_registrations_2017_2021.rds") %>%
   rename(Age_gr_fig2 = Age_gr_fig_2b) %>%
   group_by(Age_gr_fig2, Week_st) %>%
   summarise(Total_deaths = n()) %>%
@@ -82,7 +82,7 @@ p1 <- ggplot(Burs_Excess, aes(x = Week_st, y = Total_deaths, color = Age_gr_fig2
 #######################################
 
 ### mcmc results
-mcmc <- readRDS("Analysis/Data/derived_data/Baseline_Mortality_MCMC_Gamma_Prior_inc_Feb_2021.rds")
+mcmc <- readRDS("Analysis/Data/derived_data/06_Baseline_Mortality_MCMC_Gamma_Prior_inc_Feb_2021.rds")
 mcmc_samples <- mcmc$output %>% filter(phase =="sampling")
 
 AG1_mcmc <- mcmc_samples[, c(paste0("Week_rate_0to5_",c(1:180)))]
@@ -107,9 +107,9 @@ WeeklyStandardise <- WeeklyStandardise %>%
   reshape2::melt(value.name = "Standard", varnames = c("list_names","Week_gr"))
 
 # Get population structure
-Pop_Str <- readRDS("Analysis/Data/derived_data/00_02_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
+Pop_Str <- readRDS("Analysis/Data/derived_data/08_Lusaka_Dist_Pop_Str_2020_imp_ests.rds")
 
-Burs_2018_2021_all_age_groups <- readRDS("Analysis/Data/derived_data/00_07_Burial_registrations_2017_2021.rds") %>%
+Burs_2018_2021_all_age_groups <- readRDS("Analysis/Data/derived_data/07_Burial_registrations_2017_2021.rds") %>%
   group_by(Age_gr, Week_st) %>%
   summarise(Total_deaths = n()) %>%
   ungroup() %>% complete(Age_gr, Week_st, fill = list(Total_deaths = 0)) %>%
@@ -272,7 +272,7 @@ Panel_G_plot_data <- Mort_excess_deaths_fig2_age_gr %>% filter(Week_st >="2020-0
   group_by(Sample) %>%
   mutate_at(c("Excess","Excess_std"),cumsum) %>%
   group_by(Week_st) %>%
-  summarise_at(c("Excess","Excess_std"),funs(median = mean(.), CI_low = bayestestR::ci(.)$CI_low, CI_high = bayestestR::ci(.)$CI_high))  %>% merge(Burs_2018_2021_Total)
+  summarise_at(c("Excess","Excess_std"),funs(median = median(.), CI_low = bayestestR::ci(.)$CI_low, CI_high = bayestestR::ci(.)$CI_high))  %>% merge(Burs_2018_2021_Total)
 
 Panel_G_plot_data_long <- merge(merge(Panel_G_plot_data %>% select(Week_st, ends_with("median")) %>% setNames(gsub("_median","",names(.))) %>% pivot_longer(cols = 2:3, names_to = "Line", values_to = "median"),
                                       Panel_G_plot_data %>% select(Week_st, ends_with("CI_low")) %>% setNames(gsub("_CI_low","",names(.))) %>% pivot_longer(cols = 2:3, names_to = "Line", values_to = "CI_low")),
@@ -314,11 +314,11 @@ p7 <- ggplot(Panel_G_plot_data_long %>% merge(Dates_df), aes(x = Week_st, color 
 ##'[Panel H: DMVI]##
 ####################################
 ## Get overall population IFR for Zambia and Lusaka
-IFR_weighted_Zamb <- readRDS("Analysis/Data/derived_data/IFR_Zambia.rds") %>% pull(IFR_Braz)
-IFR_weighted_Lus <- readRDS("Analysis/Data/derived_data/00_03_Lusaka_Overall_IFR.rds")
+IFR_weighted_Zamb <- readRDS("Analysis/Data/derived_data/09_IFR_Zambia.rds") %>% pull(IFR_Braz)
+IFR_weighted_Lus <- readRDS("Analysis/Data/derived_data/10_Lusaka_Overall_IFR.rds")
 
 # Get WHO excess mortality for Zambia by month and calculate DVWI based on Zambia IFR
-WHO_Covid_deaths <- readxl::read_xlsx("Analysis/Data/raw_data/WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx", sheet = "Country by year and month", skip =12) %>%
+WHO_Covid_deaths <- readxl::read_xlsx("Analysis/Data/raw_data/02_WHO_COVID_Excess_Deaths_EstimatesByCountry.xlsx", sheet = "Country by year and month", skip =12) %>%
   filter(country =="Zambia",year == 2020 | year == 2021 & month %in% 1:6) %>%
   select(year, month, cumul.excess.mean, cumul.excess.low, cumul.excess.high) %>%
   add_row(.before = 1, year = 2020, month = 0, cumul.excess.mean = 0, cumul.excess.low = 0, cumul.excess.high = 0) %>%

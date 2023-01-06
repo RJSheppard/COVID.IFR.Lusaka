@@ -5,7 +5,7 @@ library(dplyr)
 ############################################
 ##'[drjacoby MCMC K-fold Cross validation]##
 ############################################
-UTH_Mortality_Total <- read.csv(file = "Analysis/Data/raw_data/mortuary_records_v2.csv")
+UTH_Mortality_Total <- read.csv(file = "Analysis/Data/raw_data/11_mortuary_records_v2.csv")
 
 weekly_deaths_list_5_plus_loocv <- UTH_Mortality_Total %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
@@ -145,7 +145,7 @@ Test_weeks_match <- str2str::ld2d(lapply(1:26, function(x){
   as.data.frame(cbind(x,Test_weeks[[x]]))
 })) %>% select(x, V2) %>% rename(Week_gr = V2, Test_weeks_set = x)
 
-UTH_Mortality <- read.csv(file = "Analysis/Data/raw_data/mortuary_records.csv") %>%
+UTH_Mortality <- read.csv(file = "Analysis/Data/raw_data/11_mortuary_records.csv") %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
   filter(date >= "2018-01-01" & date < "2019-12-30", age_years !=".", dod != ".") %>%
   mutate(Age_gr = cut(as.numeric(age_years), c(seq(0,80,by = 5),Inf), right = F, labels = F),

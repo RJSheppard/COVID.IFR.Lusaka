@@ -4,7 +4,7 @@ library(tidyr)
 
 ## Format inputs
 # Burial Registration Data
-UTH_Mortality_Total <- read.csv(file = "Data/raw_data/mortuary_records_v2.csv")
+UTH_Mortality_Total <- read.csv(file = "Data/raw_data/11_mortuary_records_v2.csv")
 
 weekly_deaths_list <- UTH_Mortality_Total %>%
   mutate(date = as.Date(dod, "%m/%d/%y")) %>%
@@ -106,4 +106,4 @@ MCMC_Baseline_Excess_Burials <- drjacoby::run_mcmc(data = data_list,
                                           chains = 5,
                                           misc = list(age_cats=age_cats))
 
-saveRDS(MCMC_Baseline_Excess_Burials,"Data/derived_data/Baseline_Mortality_MCMC_Gamma_Prior_inc_Feb_2021.rds")
+saveRDS(MCMC_Baseline_Excess_Burials,"Data/derived_data/06_Baseline_Mortality_MCMC_Gamma_Prior_inc_Feb_2021.rds")

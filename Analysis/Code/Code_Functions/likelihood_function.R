@@ -320,10 +320,7 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
   rownames(Mod_Deaths_Age) <- 1:16
   Mod_Deaths_Age <- reshape2::melt(data = Mod_Deaths_Age, value.name = "Mod_cd_Lus", varnames= c("Week_gr","Age_gr")) # 16 time periods, 17 age groups.
 
-  # Comb_data <- obs_params$combined_data$Comb_data
   Mod_Deaths_Age <- merge(Mod_Deaths_Age, obs_params$combined_data$Comb_data)
-
-  # Mod_Deaths_Age %>% filter(Age_gr ==2, Week_gr ==1)
 
   ##############################################################################
   ##############################################################################
@@ -339,7 +336,7 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
   # )
 
   # Get modelled pcr prevalence by week and shape for comparison
-  pcr_perc_age <- pcr_pos_age[as.Date(rownames(out)) %in% (Days_for_comparison[-1]-3),] # This could be -3 or -4 to get Weds or Thurs.
+  pcr_perc_age <- pcr_pos_age[as.Date(rownames(out)) %in% (Days_for_comparison[-1]-3),] # This could be -3 or -4 to get Thurs or Weds.
   colnames(pcr_perc_age) <- 1:17
   pcr_perc_age <- reshape2::melt(data = pcr_perc_age, value.name = "pcr_perc", varnames= c("Week_gr","Age_gr")) # 16 time periods, 17 age groups.
 
@@ -348,16 +345,6 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
 
   ##############################################################################
   ##############################################################################
-
-  # if(obs_params$lld =="remove_weeks_4_and_5"){
-    # Mod_Deaths_Age <- Mod_Deaths_Age %>% dplyr::filter(Week_gr != 4, Week_gr != 5)
-    # obs_params$combined_data$dfj_mcmc_data <- lapply(obs_params$combined_data$dfj_mcmc_data, function(x){return(x %>% dplyr::filter(Week_gr != 4, Week_gr != 5))})}
-  # if(obs_params$lld =="remove_under_5s"){
-    # Mod_Deaths_Age <- Mod_Deaths_Age %>% dplyr::filter(Age_gr != 1)
-    # obs_params$combined_data$dfj_mcmc_data <- lapply(obs_params$combined_data$dfj_mcmc_data, function(x){return(x %>% dplyr::filter(Age_gr != 1))})}
-  # if(obs_params$lld =="remove_weeks_4_and_5_and_age_under_5s"){
-    # Mod_Deaths_Age <- Mod_Deaths_Age %>% dplyr::filter(Age_gr != 1,Week_gr != 4,Week_gr != 5)}
-    # obs_params$combined_data$dfj_mcmc_data <- lapply(obs_params$combined_data$dfj_mcmc_data, function(x){return(x %>% dplyr::filter(Age_gr != 1,Week_gr != 4,Week_gr != 5))})}
 
   ll_aw_pois <- 0
   ll_aw_bin <- 0
@@ -387,11 +374,6 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
       tmp_df <- merge(Mod_Deaths_Age, obs_params$combined_data$dfj_mcmc_data[[y]], all = F)
       ll_pois_tmp <- sum(dpois(x = tmp_df$Bur_regs, lambda = (tmp_df$Mod_cd_frac*tmp_df$ag1std + tmp_df$Mort_ncd_mcmc), log = T))
       ll_binom_tmp <- sum(dbinom(x = tmp_df$PosTests, size =  tmp_df$Samples, prob =  (tmp_df$Mod_cd_frac * tmp_df$ag1std + tmp_df$Mort_ncd_mcmc * tmp_df$pcr_perc)/(tmp_df$Mod_cd_frac*tmp_df$ag1std + tmp_df$Mort_ncd_mcmc), log = T))
-      # tmp_df$Mod_ncd_Lus <- tmp_df$Bur_regs/tmp_df$ag1std - tmp_df$Mod_cd_Lus
-      # tmp_df$Mod_ncd_Lus <- ifelse(tmp_df$Mod_ncd_Lus<0,0,tmp_df$Mod_ncd_Lus)
-      # tmp_df$Mod_pos_ds_Lus <- tmp_df$Mod_cd_Lus+tmp_df$Mod_ncd_Lus*tmp_df$pcr_perc # total positive deaths (covid and coincidental)
-      # tmp_df$Pos_prev <- ifelse(tmp_df$Mod_pos_ds_Lus<=tmp_df$Bur_regs/tmp_df$ag1std,tmp_df$Mod_pos_ds_Lus/(tmp_df$Bur_regs/tmp_df$ag1std), 0.999)
-      # ll_binom_tmp <- sum(dbinom(tmp_df$PosTests, tmp_df$Samples, prob = tmp_df$Pos_prev, log = T))
       return(data.frame(ll_pois = ll_pois_tmp, ll_binom = ll_binom_tmp))
     })
 
@@ -403,32 +385,6 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
   ##############################################################################
   ##############################################################################
 
-  ################################################
-  ################################################
-  ## And the ll for the combined prevalence.
-  # llc <- 0
-  # if(all(unlist(lapply(list(obs_params$comb_df, obs_params$comb_det),function(x){!is.null(x)})))){
-  #   comb_df <- obs_params$comb_df
-  #   comb_det <- obs_params$comb_det
-  #
-  #   ### Model PCR: Number of Infections/combined prevalence
-  #   Sus <- rowSums(out[,index$S])
-  #   infs <- c(0,as.integer(diff(max(Sus)-Sus)))
-  #   comb_positive <- roll_func_10(infs, comb_det)
-  #   comb_perc <- comb_positive/max(Sus)
-  #
-  #   # comb_dates <- c(comb_df$date_start, comb_df$date_end, comb_df$date_start + as.integer((comb_df$date_end - comb_df$date_start)/2))#list(comb_df$date_end, comb_df$date_start, comb_df$date_start + as.integer((comb_df$date_end - comb_df$date_start)/2))
-  #   comb_dates <- seq.Date(from = comb_df$date_start, to = comb_df$date_end, by = 1)
-  #   comb_perc <- comb_perc[as.Date(rownames(out)) %in% comb_dates]
-  #
-  #   # likelihood of model obvs
-  #   llc <- dbinom(comb_df$comb_pos, comb_df$samples, mean(comb_perc), log = TRUE)
-  # }
-  ################################################
-  ################################################
-
-  ################################################
-  ################################################
   ## ll for pcr prevalence.
   ll_pcr <- 0
   if(all(unlist(lapply(list(obs_params$pcr_df, obs_params$pcr_det),function(x){!is.null(x)})))){
@@ -453,10 +409,6 @@ run_deterministic_10_pois_bin_bin_ag1std_agRR <- function(data,
   # format similar to particle_filter nomenclature
   pf_results <- list()
   pf_results$log_likelihood <- ll
-
-  # pf_results$ll_pois <- LL_int %>% dplyr::filter(LL =="ll_pois") %>% dplyr::pull(ll)
-  # pf_results$ll_bin <- LL_int %>% dplyr::filter(LL =="ll_bin") %>% dplyr::pull(ll)
-  # pf_results$ll_comb <- llc
 
   # single returns final state
   if (save_history) {
