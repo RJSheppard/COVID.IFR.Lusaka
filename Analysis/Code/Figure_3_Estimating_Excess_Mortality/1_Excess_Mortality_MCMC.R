@@ -71,7 +71,7 @@ r_logprior <- function(params, misc) {
   ret <- 0
 
   # Add a prior for each of the age group relative risks
-  ret <- ret + sum(dlnorm(x = rel_rates, meanlog = 1, sdlog = 10, log = T))
+  ret <- ret + sum(dlnorm(x = rel_rates, meanlog = 0, sdlog = 10, log = T))
   ret <- ret + sum(dunif(x = base_w_rates, min = 0, max = 200, log = T))
 
   # return
