@@ -1,0 +1,29 @@
+Package: COVID.IFR.Lusaka
+Type: Package
+Title: Analysis of COVID-19 mortality ascertainment
+Version: 0.1.0
+Authors@R: c(
+  person("Richard", "Sheppard", email = "richard.sheppard11@imperial.ac.uk", role = c("aut", "cre"))
+  )
+Description: Code repository Using mortuary and burial data to place COVID-19 in Lusaka, Zambia within a global context. 
+License: MIT + file LICENCE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    here,
+    squire,
+    scales,
+    lubridate,
+    knitr,
+    ggplot2,
+    future,
+    magrittr,
+    rlang,
+    cowplot,
+    dplyr, 
+    tidyr,
+    zoo
+Remotes:
+    mrc-ide/squire,
+    mrc-ide/odin
+RoxygenNote: 7.2.1
